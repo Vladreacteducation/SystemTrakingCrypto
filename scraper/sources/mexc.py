@@ -88,21 +88,34 @@ def fetch_mexc_offers(assets: list[str]) -> list[Offer]:
             url = f"https://www.mexc.com/earn?page={page}"
             try:
                 driver.get(url)
-            except Exception:
-                pass
+            except Exception as exc:
+                print(f"[mexc] page {page} load error: {exc}")
             time.sleep(PAGE_LOAD_WAIT_SECONDS)
 
+            page_body = driver.find_element(By.TAG_NAME, "body").text
+            print(f"[mexc] page {page}: title={driver.title!r} body_len={len(page_body)}")
+            if len(page_body) < 500:
+                # Likely a bot-check/error page rather than the real Earn table.
+                print(f"[mexc] page {page}: suspiciously short body, snippet={page_body[:300]!r}")
+
             for asset in assets:
+                if asset not in page_body:
+                    print(f"[mexc] page {page}: '{asset}' not present in rendered page text")
+                    continue
+
                 try:
                     row = driver.find_element(By.XPATH, f"//tr[contains(., '{asset}')]")
-                except Exception:
+                except Exception as exc:
+                    print(f"[mexc] page {page}: '{asset}' found in text but no matching <tr>: {exc}")
                     continue
 
                 try:
                     driver.execute_script("arguments[0].click();", row)
                     time.sleep(ROW_EXPAND_WAIT_SECONDS)
                     body_text = driver.find_element(By.TAG_NAME, "body").text
-                    offers.extend(_parse_asset_offers(body_text, asset, page))
+                    found = _parse_asset_offers(body_text, asset, page)
+                    print(f"[mexc] page {page}: '{asset}' row expanded, parsed {len(found)} offer(s)")
+                    offers.extend(found)
                 except Exception as exc:
                     print(f"[mexc] {asset} page {page}: {exc}")
     finally:
