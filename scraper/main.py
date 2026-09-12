@@ -1,7 +1,14 @@
 from sources.bybit import fetch_bybit_offers
 from sources.defillama import fetch_defillama_offers
 from sources.mexc import fetch_mexc_offers
-from supabase_client import get_client, get_notified_keys, get_watchlist, log_notifications, upsert_offers
+from supabase_client import (
+    get_client,
+    get_notified_keys,
+    get_watchlist,
+    log_notifications,
+    prune_stale_offers,
+    upsert_offers,
+)
 from telegram import send_telegram
 
 
@@ -35,6 +42,8 @@ def run() -> None:
             found = fetch(assets)
             print(f"[main] {label}: {len(found)} offers")
             offers.extend(found)
+            upsert_offers(client, found)
+            prune_stale_offers(client, label, {o.external_id for o in found})
         except Exception as exc:
             print(f"[main] {label} failed: {exc}")
             send_telegram(f"[WARN] {label} scrape failed:\n{exc}")
@@ -42,8 +51,6 @@ def run() -> None:
     if not offers:
         print("[main] no offers found this run")
         return
-
-    upsert_offers(client, offers)
 
     notified_keys = get_notified_keys(client)
     to_notify = [

@@ -49,6 +49,15 @@ def upsert_offers(client: Client, offers: list[Offer]) -> None:
     client.table("earn_offers_history").insert(history_rows).execute()
 
 
+def prune_stale_offers(client: Client, source: str, current_external_ids: set[str]) -> None:
+    existing = client.table("earn_offers").select("external_id").eq("source", source).execute()
+    stale_ids = [row["external_id"] for row in existing.data if row["external_id"] not in current_external_ids]
+    if not stale_ids:
+        return
+    client.table("earn_offers").delete().eq("source", source).in_("external_id", stale_ids).execute()
+    print(f"[supabase] pruned {len(stale_ids)} stale {source} offer(s)")
+
+
 def get_watchlist(client: Client) -> dict[str, float]:
     result = client.table("watchlist").select("asset,min_apr").eq("enabled", True).execute()
     return {row["asset"].upper(): float(row["min_apr"]) for row in result.data}
