@@ -9,6 +9,9 @@ def format_offer(offer) -> str:
     if offer.duration_days:
         parts.append(f"{offer.duration_days}d")
     parts.append(offer.product_type)
+    tvl = offer.extra.get("tvl_usd")
+    if tvl:
+        parts.append(f"TVL ${tvl:,.0f}")
     return " | ".join(parts)
 
 
