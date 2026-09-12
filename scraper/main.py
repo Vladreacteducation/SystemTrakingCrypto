@@ -1,3 +1,4 @@
+from sources.bybit import fetch_bybit_offers
 from sources.defillama import fetch_defillama_offers
 from sources.mexc import fetch_mexc_offers
 from supabase_client import get_client, get_notified_keys, get_watchlist, log_notifications, upsert_offers
@@ -25,7 +26,11 @@ def run() -> None:
         return
 
     offers = []
-    for label, fetch in (("mexc", fetch_mexc_offers), ("defillama", fetch_defillama_offers)):
+    for label, fetch in (
+        ("mexc", fetch_mexc_offers),
+        ("bybit", fetch_bybit_offers),
+        ("defillama", fetch_defillama_offers),
+    ):
         try:
             found = fetch(assets)
             print(f"[main] {label}: {len(found)} offers")
