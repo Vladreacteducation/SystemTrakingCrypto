@@ -7,14 +7,7 @@ load_dotenv(Path(__file__).parent / ".env")
 from sources.bybit import fetch_bybit_offers
 from sources.defillama import fetch_defillama_offers
 from sources.mexc import fetch_mexc_offers
-from supabase_client import (
-    get_client,
-    get_notified_keys,
-    get_watchlist,
-    log_notifications,
-    prune_stale_offers,
-    upsert_offers,
-)
+from supabase_client import get_client, get_watchlist, prune_stale_offers, upsert_offers
 from telegram import send_telegram
 
 
@@ -58,24 +51,21 @@ def run() -> None:
         print("[main] no offers found this run")
         return
 
-    notified_keys = get_notified_keys(client)
+    # Sends every run that clears the threshold (a recurring digest), not just
+    # on change — the user wants a steady heartbeat, not a change-only alert.
     to_notify = [
         offer
         for offer in offers
         if offer.status == "available"
         and offer.apr >= watchlist.get(offer.asset.upper(), float("inf"))
-        and (offer.source, offer.external_id, offer.apr, offer.status) not in notified_keys
     ]
 
     if to_notify:
         message = "\n".join(format_offer(o) for o in to_notify)
         print(f"[main] notifying about {len(to_notify)} offer(s):\n{message}")
-        if send_telegram(message):
-            log_notifications(client, to_notify)
-        else:
-            print("[main] telegram send failed, NOT marking as notified (will retry next run)")
+        send_telegram(message)
     else:
-        print("[main] nothing new to notify")
+        print("[main] nothing clears the watchlist threshold this run")
 
 
 if __name__ == "__main__":
