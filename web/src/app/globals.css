@@ -13,6 +13,7 @@
   --series-bybit: #2a78d6;
   --series-mexc: #eb6834;
   --series-defillama: #1baf7a;
+  --series-stakingrewards: #eda100;
 
   --status-good: #0ca30c;
   --status-critical: #d03b3b;
@@ -39,6 +40,7 @@
     --series-bybit: #3987e5;
     --series-mexc: #d95926;
     --series-defillama: #199e70;
+    --series-stakingrewards: #c98500;
   }
 }
 

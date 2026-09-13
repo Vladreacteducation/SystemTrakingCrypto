@@ -6,6 +6,8 @@ export function seriesColorVar(source: string): string {
       return "var(--series-mexc)";
     case "defillama":
       return "var(--series-defillama)";
+    case "stakingrewards":
+      return "var(--series-stakingrewards)";
     default:
       return "var(--muted)";
   }
