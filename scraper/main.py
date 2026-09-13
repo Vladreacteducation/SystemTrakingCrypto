@@ -64,8 +64,10 @@ def run() -> None:
     if to_notify:
         message = "\n".join(format_offer(o) for o in to_notify)
         print(f"[main] notifying about {len(to_notify)} offer(s):\n{message}")
-        send_telegram(message)
-        log_notifications(client, to_notify)
+        if send_telegram(message):
+            log_notifications(client, to_notify)
+        else:
+            print("[main] telegram send failed, NOT marking as notified (will retry next run)")
     else:
         print("[main] nothing new to notify")
 
