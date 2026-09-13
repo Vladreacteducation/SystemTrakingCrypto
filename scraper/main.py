@@ -1,3 +1,7 @@
+from dotenv import load_dotenv
+
+load_dotenv()
+
 from sources.bybit import fetch_bybit_offers
 from sources.defillama import fetch_defillama_offers
 from sources.mexc import fetch_mexc_offers
