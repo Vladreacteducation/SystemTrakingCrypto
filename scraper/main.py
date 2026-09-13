@@ -1,6 +1,8 @@
+from pathlib import Path
+
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(Path(__file__).parent / ".env")
 
 from sources.bybit import fetch_bybit_offers
 from sources.defillama import fetch_defillama_offers
