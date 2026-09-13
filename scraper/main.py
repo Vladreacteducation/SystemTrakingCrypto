@@ -1,7 +1,6 @@
 from sources.bybit import fetch_bybit_offers
 from sources.defillama import fetch_defillama_offers
 from sources.mexc import fetch_mexc_offers
-from sources.stakingrewards import fetch_stakingrewards_offers
 from supabase_client import (
     get_client,
     get_notified_keys,
@@ -38,7 +37,6 @@ def run() -> None:
         ("mexc", fetch_mexc_offers),
         ("bybit", fetch_bybit_offers),
         ("defillama", fetch_defillama_offers),
-        ("stakingrewards", fetch_stakingrewards_offers),
     ):
         try:
             found = fetch(assets)

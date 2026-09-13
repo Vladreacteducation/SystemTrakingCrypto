@@ -31,5 +31,4 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           BYBIT_API_KEY: ${{ secrets.BYBIT_API_KEY }}
           BYBIT_API_SECRET: ${{ secrets.BYBIT_API_SECRET }}
-          STAKINGREWARDS_API_KEY: ${{ secrets.STAKINGREWARDS_API_KEY }}
         run: python main.py
