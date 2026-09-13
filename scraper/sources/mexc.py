@@ -84,6 +84,13 @@ def fetch_mexc_offers(assets: list[str]) -> list[Offer]:
     driver = _build_driver()
 
     try:
+        # One-off sanity check: is Chrome rendering JS-heavy pages at all in
+        # this session, or is MEXC specifically the problem?
+        driver.get("https://example.com")
+        sanity_body = driver.find_element(By.TAG_NAME, "body").text
+        print(f"[mexc] sanity check example.com: body_len={len(sanity_body)}, "
+              f"chrome={driver.capabilities.get('browserVersion')}")
+
         for page in range(1, PAGES_TO_SCAN + 1):
             url = f"https://www.mexc.com/earn?page={page}"
             try:
